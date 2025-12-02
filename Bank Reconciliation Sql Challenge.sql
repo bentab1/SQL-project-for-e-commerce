@@ -6,9 +6,9 @@
 * Tables used: `bank_a_transactions`, `bank_b_transactions`, `settlement`.
 * Common SQL commands in PostgreSQL, MySQL, and Oracle.
 
-## 2. Database Schema
+## Database Schema
 
-### 2.1 Bank A Transactions
+--Bank A Transactions Table
 
 CREATE TABLE bank_a_transactions (
     transaction_id SERIAL PRIMARY KEY,
@@ -19,7 +19,7 @@ CREATE TABLE bank_a_transactions (
     reference_number VARCHAR(50) UNIQUE
 );
 
-### 2.2 Bank B Transactions
+---Bank B Transactions table
 
 CREATE TABLE bank_b_transactions (
     transaction_id SERIAL PRIMARY KEY,
@@ -30,7 +30,7 @@ CREATE TABLE bank_b_transactions (
     reference_number VARCHAR(50) UNIQUE
 );
 
-### 2.3 Settlement Table
+---Settlement Table
 
 CREATE TABLE settlement (
     settlement_id SERIAL PRIMARY KEY,
@@ -44,7 +44,7 @@ CREATE TABLE settlement (
 );
 
 
-2️⃣ Insert Sample Transactions for Bank A
+-️---##Insert Sample Transactions for Bank A
 INSERT INTO bank_a_transactions (account_number, amount, transaction_date, description, reference_number)
 VALUES
 ('ACC10001', 1000, '2025-11-01', 'Deposit', 'REF001'),
@@ -78,7 +78,7 @@ VALUES
 ('ACC40001', 1000, '2025-11-28', 'Deposit', 'REF029'),
 ('ACC50001', 1300, '2025-11-29', 'Withdrawal', 'REF030');
 
-3️⃣ Insert Sample Transactions for Bank B
+️---#### Insert Sample Transactions for Bank B
 INSERT INTO bank_b_transactions (account_number, amount, transaction_date, description, reference_number)
 VALUES
 ('ACC10001', 1000, '2025-11-01', 'Deposit', 'REF001'), -- match
@@ -112,23 +112,14 @@ VALUES
 ('ACC40001', 1000, '2025-11-28', 'Deposit', 'REF029'), -- match
 ('ACC50001', 1350, '2025-11-29', 'Withdrawal', 'REF030'); -- mismatch
 
-4️⃣ Populate Settlement Table Automatically
---  Matched Transactions
+
+-- ## Populate Settlement Table Automatically
+-- ---Matched Transactions
 INSERT INTO settlement (
-    reference_number,
-    account_number,
-    bank_name,
-    amount,
-    settlement_status,
-    remarks
+    reference_number,account_number,bank_name,amount,settlement_status, remarks
 )
 SELECT 
-    a.reference_number,
-    a.account_number,
-    'Bank A',
-    a.amount,
-    'Settled',
-    'Matched with Bank B'
+    a.reference_number, a.account_number,'Bank A',a.amount,'Settled', 'Matched with Bank B'
 FROM 
     bank_a_transactions a
 JOIN 
@@ -137,21 +128,12 @@ JOIN
 WHERE 
     a.amount = b.amount;
 
---  Mismatched Transactions
+----- Mismatched Transactions
 INSERT INTO settlement (
-    reference_number,
-    account_number,
-    bank_name,
-    amount,
-    settlement_status,
-    remarks
+    reference_number,account_number,bank_name, amount, settlement_status,remarks
 )
 SELECT 
-    a.reference_number,
-    a.account_number,
-    'Bank A',
-    a.amount,
-    'Pending',
+    a.reference_number, a.account_number,'Bank A', a.amount, 'Pending',
     CASE 
         WHEN b.reference_number IS NULL THEN 'Missing in Bank B'
         ELSE 'Amount mismatch with Bank B'
@@ -165,22 +147,13 @@ WHERE
     b.reference_number IS NULL 
     OR a.amount <> b.amount;
 
----------- Missing transaction
+------Missing transaction
 
 INSERT INTO settlement (
-    reference_number,
-    account_number,
-    bank_name,
-    amount,
-    settlement_status,
-    remarks
+    reference_number, account_number,bank_name, amount,settlement_status, remarks
 )
 SELECT 
-    b.reference_number,
-    b.account_number,
-    'Bank B',
-    b.amount,
-    'Pending',
+    b.reference_number, b.account_number,'Bank B',b.amount,'Pending',
     CASE 
         WHEN a.reference_number IS NULL THEN 'Missing in Bank A'
         ELSE 'Amount mismatch with Bank A'
@@ -197,19 +170,10 @@ WHERE
 
 ---Missing transactions
 INSERT INTO settlement (
-    reference_number,
-    account_number,
-    bank_name,
-    amount,
-    settlement_status,
-    remarks
+    reference_number, account_number,bank_name,amount,settlement_status,remarks
 )
 SELECT 
-    a.reference_number,
-    a.account_number,
-    'Bank A',
-    a.amount,
-    'Pending',
+    a.reference_number,a.account_number, 'Bank A',a.amount,'Pending',
     CASE 
         WHEN b.reference_number IS NULL THEN 'Missing in Bank B'
         ELSE 'Amount mismatch with Bank B'
@@ -223,17 +187,8 @@ WHERE
     (b.reference_number IS NULL OR a.amount <> b.amount)
     AND a.transaction_date BETWEEN '2025-11-10' AND CURRENT_DATE;
 
---------------------------------------------------------------------------
-
-5️⃣ Sample Settlement Queries
--- View all settlements
-SELECT * FROM settlement ORDER BY settlement_status DESC, settlement_date;
--- Count by settlement status
-SELECT settlement_status, COUNT(*) AS total_transactions, SUM(amount) AS total_amount
-FROM settlement
-GROUP BY settlement_status;
-
-## 5. Sample Settlement Queries
+------------------------------------------------------------------------------
+️---### Settlement Queries
 
 -- View all settlements
 SELECT * FROM settlement ORDER BY settlement_status DESC, settlement_date;
@@ -248,35 +203,32 @@ SELECT * FROM settlement WHERE remarks LIKE '%Amount mismatch%';
 SELECT * FROM settlement WHERE remarks = 'Missing in Bank A';
 SELECT * FROM settlement WHERE remarks = 'Missing in Bank B';
 
-
---6. Practice Exercises
-- 1. List all settled transactions
--- 3. Find all mismatched transactions
+-- - Find all mismatched transactions
 SELECT * FROM settlement WHERE remarks LIKE '%Amount mismatch%';
 
 
--- 4. Find transactions missing in Bank A
+-- --- Find transactions missing in Bank A
 SELECT * FROM settlement WHERE remarks = 'Missing in Bank A';
 
 
--- 5. Find transactions missing in Bank B
+-----Find transactions missing in Bank B
 SELECT * FROM settlement WHERE remarks = 'Missing in Bank B';
 
 
--- 6. Count transactions by status
+----- Count transactions by status
 SELECT settlement_status, COUNT(*) AS total_transactions, SUM(amount) AS total_amount
 FROM settlement
 GROUP BY settlement_status;
 
 
--- 7. Total pending amount per bank
+-- ---Total pending amount per bank
 SELECT bank_name, SUM(amount) AS pending_amount
 FROM settlement
 WHERE settlement_status = 'Pending'
 GROUP BY bank_name;
 
 
--- 8. Top 5 accounts with highest pending settlement
+------Top 5 accounts with highest pending settlement
 SELECT account_number, SUM(amount) AS total_pending
 FROM settlement
 WHERE settlement_status = 'Pending'
@@ -285,7 +237,7 @@ ORDER BY total_pending DESC
 LIMIT 5;
 
 
--- 9. Reconcile Bank A vs Bank B
+----Reconcile Bank A vs Bank B
 SELECT a.reference_number, a.account_number AS bank_a_account, a.amount AS bank_a_amount,
 b.account_number AS bank_b_account, b.amount AS bank_b_amount
 FROM bank_a_transactions a
@@ -293,7 +245,7 @@ JOIN bank_b_transactions b ON a.reference_number = b.reference_number
 WHERE a.amount <> b.amount;
 
 
--- 10. Summary report per account
+---Summary report per account
 SELECT account_number,
 SUM(CASE WHEN settlement_status='Settled' THEN amount ELSE 0 END) AS total_settled,
 SUM(CASE WHEN settlement_status='Pending' THEN amount ELSE 0 END) AS total_pending,
@@ -303,84 +255,117 @@ GROUP BY account_number
 ORDER BY total_amount DESC;
 
 
--- 11. Identify accounts with both settled and pending transactions
+-----Identify accounts with both settled and pending transactions
 SELECT account_number
 FROM settlement
 GROUP BY account_number
 HAVING COUNT(DISTINCT settlement_status) > 1;
 
 
--- 12. Simulate manual settlement
+-----Simulate manual settlement
 UPDATE settlement
 SET settlement_status = 'Settled', remarks = 'Manually verified and settled'
 WHERE reference_number = 'REF004';
-## 7. Additional Challenges
-
-* Aggregate reports by bank and account.
-* Detect duplicates or exceptions.
-* Multi-account settlements and reversal handling.
-
-## 8. Hints / Notes
-
-* Use JOIN, LEFT JOIN for reconciliation.
-* Use GROUP BY and SUM for totals.
-* Use CASE statements for conditional calculations.
-* Filter pending transactions to identify mismatches or missing records.
-
-## 9. Reconciliation Setup Methods
-
-### A. Direct Database Access
-
-* Rare; requires read-only access.
-* Example query to fetch Bank B transactions.
-
-### B. API Access
-
-* Common; banks expose REST/SOAP APIs.
-* Fetch data, import into local database for reconciliation.
-* Example in Python using requests and pandas.
-
-### C. File Exchange
-
-* CSV, Excel, or SWIFT messages.
-* Load files into Bank A database and join with Bank B data.
-
-## 10. Security Considerations
-
-* Secure channels (VPN, API tokens, encrypted files).
-* Compliance, logs, and approvals.
-
-## 11. SQL Table Modifications
-
-### 11.1 Add a Column
+ Additional Challenges
 
 
-ALTER TABLE table_name ADD COLUMN column_name data_type [DEFAULT value];
+️---Aggregate Reports by Bank and Account
+-- Total settled and pending amounts per bank and account
+SELECT 
+    bank_name,
+    account_number,
+    SUM(CASE WHEN settlement_status = 'Settled' THEN amount ELSE 0 END) AS total_settled,
+    SUM(CASE WHEN settlement_status = 'Pending' THEN amount ELSE 0 END) AS total_pending,
+    SUM(amount) AS total_amount
+FROM settlement
+GROUP BY bank_name, account_number
+ORDER BY bank_name, total_amount DESC;
+
+----- Detect Duplicates or Exceptions
+-- Find duplicate transactions based on reference_number
+SELECT reference_number, account_number, COUNT(*) AS duplicate_count
+FROM bank_a_transactions
+GROUP BY reference_number, account_number
+HAVING COUNT(*) > 1;
+
+-- Detect mismatched amounts between Bank A and Bank B
+SELECT a.reference_number, a.account_number AS bank_a_account, a.amount AS bank_a_amount,
+       b.account_number AS bank_b_account, b.amount AS bank_b_amount
+FROM bank_a_transactions a
+JOIN bank_b_transactions b ON a.reference_number = b.reference_number
+WHERE a.amount <> b.amount;
+
+---- Multi-Account Settlements and Reversal Handling
+-- Example: Identify transactions involving multiple accounts with the same reference
+SELECT reference_number, COUNT(DISTINCT account_number) AS accounts_involved
+FROM settlement
+GROUP BY reference_number
+HAVING COUNT(DISTINCT account_number) > 1;
+
+-- Mark a transaction as reversed
+UPDATE settlement
+SET settlement_status = 'Reversed', remarks = 'Transaction reversed due to error'
+WHERE reference_number = 'REF004';
+
+-- Adjust settlement amount for a reversal or correction
+UPDATE settlement
+SET amount = amount - 500, remarks = 'Adjusted for reversal'
+WHERE reference_number = 'REF010';
 
 
-### 11.2 Rename a Column
+--### Use JOIN and LEFT JOIN for Reconciliation
+-- Find transactions in Bank A that match Bank B by reference and amount
+SELECT a.reference_number, a.account_number AS bank_a_account, a.amount AS bank_a_amount,
+       b.account_number AS bank_b_account, b.amount AS bank_b_amount
+FROM bank_a_transactions a
+JOIN bank_b_transactions b 
+  ON a.reference_number = b.reference_number
+WHERE a.amount = b.amount;
 
+-- Find transactions in Bank A that are missing or mismatched in Bank B
+SELECT a.reference_number, a.account_number, a.amount, b.amount AS bank_b_amount
+FROM bank_a_transactions a
+LEFT JOIN bank_b_transactions b
+  ON a.reference_number = b.reference_number
+WHERE b.reference_number IS NULL OR a.amount <> b.amount;
 
-ALTER TABLE table_name RENAME COLUMN old_column_name TO new_column_name;
+----### Use GROUP BY and SUM for Totals
+-- Total settled and pending amounts per account
+SELECT account_number,
+       SUM(CASE WHEN settlement_status = 'Settled' THEN amount ELSE 0 END) AS total_settled,
+       SUM(CASE WHEN settlement_status = 'Pending' THEN amount ELSE 0 END) AS total_pending,
+       SUM(amount) AS total_amount
+FROM settlement
+GROUP BY account_number
+ORDER BY total_amount DESC;
 
+---### Use CASE Statements for Conditional Calculations
+-- Classify transactions by amount type
+SELECT reference_number,
+       account_number,
+       amount,
+       CASE 
+           WHEN amount > 2000 THEN 'High Value'
+           WHEN amount BETWEEN 1000 AND 2000 THEN 'Medium Value'
+           ELSE 'Low Value'
+       END AS transaction_category
+FROM settlement;
 
-### 11.3 Rename Table
+----### Filter Pending Transactions to Identify Mismatches or Missing Records
+-- Pending transactions in Bank A
+SELECT *
+FROM settlement
+WHERE settlement_status = 'Pending'
+  AND bank_name = 'Bank A';
 
+-- Identify pending transactions with mismatched amounts
+SELECT reference_number, account_number, bank_name, amount, remarks
+FROM settlement
+WHERE settlement_status = 'Pending'
+  AND remarks LIKE '%mismatch%';
 
-ALTER TABLE old_table_name RENAME TO new_table_name;
-
-
-### 11.4 Change Column Type
-
-
-ALTER TABLE table_name ALTER COLUMN column_name TYPE new_data_type;
-
-
-### Summary of Operations
-
-| Operation          | Command                                                        |
-| ------------------ | -------------------------------------------------------------- |
-| Add column         | ALTER TABLE table_name ADD COLUMN column_name TYPE;            |
-| Rename column      | ALTER TABLE table_name RENAME COLUMN old_name TO new_name;     |
-| Rename table       | ALTER TABLE old_table_name RENAME TO new_table_name;           |
-| Change column type | ALTER TABLE table_name ALTER COLUMN column_name TYPE new_type; |
+-- Identify pending transactions missing in Bank B
+SELECT reference_number, account_number, amount
+FROM settlement
+WHERE settlement_status = 'Pending'
+  AND remarks = 'Missing in Bank B';
