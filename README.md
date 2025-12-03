@@ -1,45 +1,132 @@
-SQL Analysis Project – E-commerce and  Bank Reconciliation SQL Project
+SQL Analysis Project – E-commerce & Bank Reconciliation
+Overview
 
+This repository contains two major SQL projects designed to demonstrate practical data analysis, financial validation, and real-world SQL problem-solving:
+
+E-commerce SQL Analysis – focused on business analytics, customer insights, product performance, and revenue trends.
+
+Bank Reconciliation SQL Project – focused on validating and reconciling financial transactions across multiple banking data sources.
+
+Both sections include assumptions, schema descriptions, use-case explanations, and SQL queries that reflect real-life analytical workflows.
 
 1. SQL Analysis Project – E-commerce
 Introduction
 
-This project demonstrates SQL analysis techniques on an e-commerce dataset. 
-The goal is to answer key business questions such as top customers, top products, 
-monthly revenue trends, product growth, and customer retention. The queries are designed 
-to provide actionable insights for product and business decision-making.
+This project showcases applied SQL techniques on an e-commerce dataset.
+The goal is to derive meaningful business insights by answering key analytical questions such as:
 
-a. Database Schema Assumptions
+a. Who are the top-spending customers?
 
-b. orders: (order_id, customer_id, order_date, total_amount)
+b. Which products generate the highest revenue?
 
-c. order_items: (order_item_id, order_id, product_id, quantity, price)
+c. How do monthly sales trends evolve over time?
 
-d. customers: (customer_id, name)
+d. What product categories are growing or declining?
 
-e. products: (product_id, name, category)
+e. How strong is customer retention and repeat purchase behavior?
 
+Each SQL query is crafted to support data-driven decision-making, helping stakeholders understand revenue performance, product demand, and customer value.
+
+Database Schema (Assumptions)
+
+The analysis is based on four key tables:
+
+i. orders
+Column	Description
+order_id	Unique order identifier
+customer_id	Links to customers table
+order_date	Date the order was placed
+total_amount	Total monetary value of the order
+ii. order_items
+Column	Description
+order_item_id	Unique ID for each line item
+order_id	Links to orders table
+product_id	Links to products table
+quantity	Number of units purchased
+price	Price per unit
+iii. customers
+Column	Description
+customer_id	Unique customer identifier
+name	Customer name
+iv. products
+Column	Description
+product_id	Unique product identifier
+name	Product name
+category	Product category or classification
 
 
 2. Bank Reconciliation SQL Project
+Introduction
 
-This page demonstrates a hands-on SQL project focused on bank reconciliation, a critical task for financial operations
-and business analysis. Bank reconciliation involves comparing transaction records from two different sources—typically 
-Bank A and Bank B—to ensure that all transactions are accurate, accounted for, and consistent.
+This project demonstrates a real-world SQL-based bank reconciliation process, a core activity in finance and accounting.
+Bank reconciliation involves comparing transaction data from two or more sources to ensure:
 
+a. All financial entries are complete
 
-a. Validate financial data by detecting mismatched or missing transactions.
+b. No transactions are missing
 
-b. Automate settlement processes to reduce manual errors and improve efficiency.
+c. No duplicates or incorrect values exist
 
-c. Generate actionable reports for decision-making and compliance.
+d. Records match across systems
 
-d. The project uses three main tables:
+This project simulates reconciliation between Bank A and Bank B, and uses SQL to automate the discovery of mismatched, missing, and matched transactions.
 
-e. bank_a_transactions – Records from Bank A.
+Objectives
 
-f. bank_b_transactions – Records from Bank B.
+The main goals of the reconciliation workflow include:
 
-g. settlement – Consolidated table tracking matched, mismatched, and pending transactions.
+a. Detecting mismatched or missing transactions between banking sources
 
-h. This section includes sample transaction inserts, automated settlement population queries, and practical SQL exercises to simulate real-world reconciliation scenarios.
+b. Automating settlement and reconciliation steps to reduce manual errors
+
+c. Generating financial reports that support audits, compliance, and internal review
+
+d. Building practical SQL logic that mirrors real corporate reconciliation pipelines
+
+Database Schema
+
+The reconciliation system uses three primary tables:
+
+1. bank_a_transactions
+
+Contains transaction logs sourced from Bank A.
+
+2. bank_b_transactions
+
+Contains transaction logs sourced from Bank B.
+
+3. settlement
+
+A consolidated table that stores results of the reconciliation process, including:
+
+Status	Meaning
+Matched	Both banks recorded the same transaction
+Mismatched	Values differ across banks
+Pending	Transaction appears in only one bank
+What This Section Includes
+
+Sample transaction inserts for both banks
+
+SQL queries to populate the settlement table automatically
+
+Logic to detect:
+
+a. missing transactions
+
+c. mismatched amounts
+
+d. timing differences
+
+c. duplicate entries
+
+Conclusion
+
+This combined project demonstrates:
+
+Strong SQL capability
+
+Practical business and financial data analysis
+
+Ability to build end-to-end analytical workflows
+
+Real-world competency in both e-commerce analytics and bank reconciliation systems
