@@ -1,8 +1,5 @@
 **SQL Analysis Project – E-commerce**
 
- 1️⃣ Top 10 Customers by Revenue
-
-
 -- ========================================
 -- Tables for E-commerce Analysis
 -- ========================================
